@@ -12,7 +12,7 @@ def rabinMiller(n):
          s = s/2
          t +=1
      k = 0
-     while k<128:
+     while k < 128:
          a = random.randrange(2,n-1)
          #a^s is computationally infeasible.  we need a more intelligent approach
          #v = (a**s)%n
