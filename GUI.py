@@ -36,9 +36,9 @@ class KeyFrame(Frame):
 		self.createWidgets()
 
 	def createWidgets(self):
-		self.string_varible_n = StringVar()
-		self.string_varible_e = StringVar()
-		self.string_varible_d = StringVar()
+		self.string_variable_n = StringVar()
+		self.string_variable_e = StringVar()
+		self.string_variable_d = StringVar()
 		
 		self.label_frame = LabelFrame(self, text='Key', padx=5, pady=5)
 		self.label_frame_public_key = LabelFrame(self.label_frame, text='Public Key', padx=5, pady=5, borderwidth=0)
@@ -47,9 +47,9 @@ class KeyFrame(Frame):
 		self.generate_key_button = Button(self.label_frame, text='Generate Key', command=self.generateKey)
 		
 		
-		self.entry_public_key_n = Entry(self.label_frame_public_key, textvariable=self.string_varible_n)
-		self.entry_public_key_e = Entry(self.label_frame_public_key, textvariable=self.string_varible_e)
-		self.entry_private_key_d = Entry(self.label_frame_private_key, textvariable=self.string_varible_d);
+		self.entry_public_key_n = Entry(self.label_frame_public_key, textvariable=self.string_variable_n)
+		self.entry_public_key_e = Entry(self.label_frame_public_key, textvariable=self.string_variable_e)
+		self.entry_private_key_d = Entry(self.label_frame_private_key, textvariable=self.string_variable_d);
 		
 		self.entry_public_key_n.pack(side=LEFT)
 		self.entry_public_key_e.pack(side=LEFT)
@@ -60,13 +60,28 @@ class KeyFrame(Frame):
 		self.generate_key_button.pack(side=RIGHT)
 		
 		self.label_frame.pack(fill=X)
+		
 	def generateKey(self):
 		n, e = self.parent.rsa.generatePublicKey()
 		d = self.parent.rsa.generatePrivateKey()
 		
-		self.string_varible_n.set('%d' % n)
-		self.string_varible_e.set('%d' % e)
-		self.string_varible_d.set('%d' % d)
+		self.string_variable_n.set('%d' % n)
+		self.string_variable_e.set('%d' % e)
+		self.string_variable_d.set('%d' % d)
+		
+	def isPublicKeyExist(self):
+		if len(self.string_variable_n.get()) == 0 or len(self.string_variable_e.get()) == 0:
+			return False
+		
+		else:
+			return True
+			
+	def isPrivateKeyExist(self):
+		if len(self.string_variable_d.get()) == 0:
+			return False
+		
+		else:
+			return True
 
 class InputFrame(Frame):
 	def __init__(self, parent):
@@ -113,16 +128,30 @@ class StringInputFrame(Frame):
 	def encryptString(self):
 		m = self.message.get()
 		
-		c = self.parent.parent.rsa.encrypt(m)
+		if self.parent.parent.key_frame.isPublicKeyExist():
+			n = self.parent.parent.key_frame.string_variable_n.get()
+			e = self.parent.parent.key_frame.string_variable_e.get()
+			c = self.parent.parent.rsa.encryptWithPublicKey(m, int(e), int(n))
+			
+		else:
+			self.parent.parent.key_frame.generateKey()
+			c = self.parent.parent.rsa.encrypt(m)
 		
 		self.parent.parent.output_frame.displayOutput(c)
 		
 	def decryptString(self):
-		c = self.parent.parent.output_frame.getOutput()
-		
-		m = self.parent.parent.rsa.decrypt(c)
-		
-		self.message.set(m);
+		if self.parent.parent.key_frame.isPublicKeyExist() and self.parent.parent.key_frame.isPrivateKeyExist():
+			c = self.parent.parent.output_frame.getOutput()
+			
+			n = self.parent.parent.key_frame.string_variable_n.get()
+			d = self.parent.parent.key_frame.string_variable_d.get()
+			
+			m = self.parent.parent.rsa.decryptWithPrivateKey(c, int(d), int(n))
+			
+			self.message.set(m);
+			
+		else:
+			pass
 		
 class FileInputFrame(Frame):
 	def __init__(self, parent):
@@ -171,8 +200,14 @@ class FileInputFrame(Frame):
 			
 			content = f.read()
 			
-			cipher = self.parent.parent.rsa.encrypt(content)
-			
+			if self.parent.parent.key_frame.isPublicKeyExist():
+				n = self.parent.parent.key_frame.string_variable_n.get()
+				e = self.parent.parent.key_frame.string_variable_e.get()
+				cipher = self.parent.parent.rsa.encryptWithPublicKey(content, int(e), int(n))
+			else:
+				self.parent.parent.key_frame.generateKey()
+				cipher = self.parent.parent.rsa.encrypt(content)
+				
 			self.parent.parent.output_frame.displayOutput(cipher)
 			
 			new_f.write(cipher)
@@ -181,19 +216,28 @@ class FileInputFrame(Frame):
 			new_f.close()
 			
 	def decryptFile(self):
-		path_name = self.file_path.get()
-		
-		if os.path.isfile(path_name):
-		
-			f = open(path_name, 'r')
+		if self.parent.parent.key_frame.isPublicKeyExist() and self.parent.parent.key_frame.isPrivateKeyExist():
+			path_name = self.file_path.get()
 			
-			cipher = f.read()
-			
-			content = self.parent.parent.rsa.decrypt(cipher)
-			
-			self.parent.parent.output_frame.displayOutput(content)
-			
-			f.close()
+			if os.path.isfile(path_name):
+				
+				f = open(path_name, 'r')
+				
+				cipher = f.read()
+				
+				n = self.parent.parent.key_frame.string_variable_n.get()
+				d = self.parent.parent.key_frame.string_variable_d.get()
+				
+				content = self.parent.parent.rsa.decryptWithPrivateKey(cipher, int(d), int(n))
+				
+				self.parent.parent.output_frame.displayOutput(content)
+				
+				f.close()
+			else:
+				pass
+				
+		else:
+			pass
 
 class OutputFrame(Frame):
 	def __init__(self, parent):

@@ -181,6 +181,28 @@ class RSA():
 		
 		return s
 		
+	def encryptWithPublicKey(self, s, e, n):
+		cipher = list()
+		
+		for c in s:
+			cipher.append(str(self.modPow(ord(c), e, n)))
+		
+		print cipher
+		
+		return '\n'.join(cipher)
+		
+	def decryptWithPrivateKey(self, c, d, n):
+		s = ""
+		cipher = c.split('\n')
+		
+		for m in cipher:
+			if m.isdigit():
+				s += chr(self.modPow(int(m), d, n))
+				
+				#print m
+		
+		return s
+		
 if __name__ == '__main__':
 	rsa = RSA(128)
 	rsa.generatePublicKey()
