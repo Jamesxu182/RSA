@@ -168,22 +168,16 @@ class RSA():
 		print cipher
 		
 		return '\n'.join(cipher)
-
-	def decrypt(self, c):
-		m = self.modPow(c, self.d, self.n);
-		
-		print "M: ", m
-		
-		return m
 		
 	def decrypt(self, c):
 		s = ""
 		cipher = c.split('\n')
 		
 		for m in cipher:
-			s += chr(self.modPow(int(m), self.d, self.n))
-		
-		print s
+			if m.isdigit():
+				s += chr(self.modPow(int(m), self.d, self.n))
+				
+				#print m
 		
 		return s
 		
@@ -192,4 +186,4 @@ if __name__ == '__main__':
 	rsa.generatePublicKey()
 	rsa.generatePrivateKey();
 	a = rsa.encrypt('Hello World')
-	rsa.decrypt(a);
+	print rsa.decrypt(a);
