@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import *
-from ttk import Notebook
+import ttk
 from RSA import *
 from tkFileDialog import askopenfilename
 import os.path
@@ -25,7 +25,7 @@ class MainFrame(Frame):
 		self.key_frame.pack(fill=X)
 		self.input_frame.pack(fill=X)
 		self.output_frame.pack(fill=X)
-		self.state_frame.pack(fill=X)
+		self.state_frame.pack(fill=X, side=BOTTOM)
 
 class KeyFrame(Frame):
 	def __init__(self, parent):
@@ -51,8 +51,8 @@ class KeyFrame(Frame):
 		self.entry_public_key_e = Entry(self.label_frame_public_key, textvariable=self.string_variable_e)
 		self.entry_private_key_d = Entry(self.label_frame_private_key, textvariable=self.string_variable_d);
 		
-		self.entry_public_key_n.pack(side=LEFT)
-		self.entry_public_key_e.pack(side=LEFT)
+		self.entry_public_key_n.pack(side=LEFT, expand=1)
+		self.entry_public_key_e.pack(side=RIGHT, expand=1)
 		self.entry_private_key_d.pack(fill=X)
 		
 		self.label_frame_public_key.pack(fill=X)
@@ -93,7 +93,7 @@ class InputFrame(Frame):
 	def createWidgets(self):
 		self.label_frame = LabelFrame(self, text="Input", padx=5, pady=5)
 		
-		self.notebook = Notebook(self.label_frame)
+		self.notebook = ttk.Notebook(self.label_frame)
 		
 		self.string_input_frame = StringInputFrame(self)
 		self.file_input_frame = FileInputFrame(self)
@@ -248,13 +248,13 @@ class OutputFrame(Frame):
 	def createWidgets(self):
 		self.label_frame = LabelFrame(self, padx=5, pady=5, text="Output")
 		
-		self.output_text = Text(self.label_frame, width=46, height=15)
+		self.output_text = Text(self.label_frame)
 		
-		self.scroll = Scrollbar(self.label_frame)
+		self.scroll = ttk.Scrollbar(self.label_frame)
 		
 		self.label_frame.pack(fill=BOTH)
 		self.scroll.pack(side=RIGHT)
-		self.output_text.pack(side=RIGHT)
+		self.output_text.pack(side=LEFT)
 		
 	def displayOutput(self, output_message):
 		self.output_text.delete(1.0, END)								#clear screen
@@ -271,7 +271,7 @@ class StateFrame(Frame):
 	
 	def createWidgets(self):
 		self.frame = Frame(self, padx=5, pady=5, relief=RIDGE)
-		self.state_label = Label(self, text="")
+		self.state_label = Label(self, text="Hello")
 		
 		self.state_label.pack(fill=X)
 		self.frame.pack(fill=BOTH)
@@ -281,10 +281,11 @@ class StateFrame(Frame):
 
 def main():
 	root = Tk()
+	root.geometry('360x670+200+200')
 	root.title('RSA');                              					#set window title as "RSA"
 	root.resizable(width=False, height=False);      					#do not allow resize window
 	main = MainFrame(root)
-	main.pack(fill=BOTH, expand=1)
+	main.pack(fill=BOTH)
 	root.mainloop()
 
 if __name__ == '__main__':
