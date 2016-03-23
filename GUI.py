@@ -20,12 +20,10 @@ class MainFrame(Frame):
 		self.key_frame = KeyFrame(self)
 		self.input_frame = InputFrame(self)
 		self.output_frame = OutputFrame(self)
-		self.state_frame = StateFrame(self)
 		
 		self.key_frame.pack(fill=X)
 		self.input_frame.pack(fill=X)
 		self.output_frame.pack(fill=X)
-		self.state_frame.pack(fill=X, side=BOTTOM)
 
 class KeyFrame(Frame):
 	def __init__(self, parent):
@@ -254,7 +252,7 @@ class OutputFrame(Frame):
 		
 		self.label_frame.pack(fill=BOTH)
 		self.scroll.pack(side=RIGHT)
-		self.output_text.pack(side=LEFT)
+		self.output_text.pack(side=LEFT, expand=1)
 		
 	def displayOutput(self, output_message):
 		self.output_text.delete(1.0, END)								#clear screen
@@ -262,22 +260,6 @@ class OutputFrame(Frame):
 		
 	def getOutput(self):
 		return self.output_text.get(1.0, END)
-		
-class StateFrame(Frame):
-	def __init__(self, parent):
-		Frame.__init__(self, parent)
-		
-		self.createWidgets()
-	
-	def createWidgets(self):
-		self.frame = Frame(self, padx=5, pady=5, relief=RIDGE)
-		self.state_label = Label(self, text="Hello")
-		
-		self.state_label.pack(fill=X)
-		self.frame.pack(fill=BOTH)
-	
-	def changeState(state):
-		self.state_label.configure(text=state)
 
 def main():
 	root = Tk()
